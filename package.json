@@ -1,0 +1,14 @@
+{
+  "name": "watchout",
+  "version": "0.0.0",
+  "description": "watchout ========",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "author": "Garrick Cheung <@garrickcheung>",
+  "license": "MIT"
+}
