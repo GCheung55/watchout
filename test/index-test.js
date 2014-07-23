@@ -6,10 +6,18 @@ var Watchout = require('../')
 
 buster.testCase('Watchout', {
     'constructor()': {
+        'task argument is optional': function() {
+            var stub = this.stub(Watchout.prototype, 'reset')
+
+            refute.exception(function() {
+                new Watchout(function() {})
+            })
+        },
+
         'should trigger reset': function() {
             var stub = this.stub(Watchout.prototype, 'reset')
 
-            new Watchout(function() {}, function() {}).cancel()
+            new Watchout(function() {}).cancel()
 
             assert.calledOnce(stub)
         },
@@ -39,6 +47,18 @@ buster.testCase('Watchout', {
                 assert.calledOnce(resetStub)
                 assert.calledOnce(doneStub)
             }
+        },
+
+        'executes callback function with success boolean': function(done) {
+            new Watchout(function(r, d){
+                d()
+            }, function(success){
+                assert.isTrue(success)
+                new Watchout(function(success){
+                    assert.isFalse(success)
+                    done()
+                })
+            })
         }
     },
 
@@ -64,7 +84,7 @@ buster.testCase('Watchout', {
         var doneStub = this.stub(Watchout.prototype, 'done')
         var _cancelStub = this.stub(Watchout.prototype, '_cancel')
 
-        var watchout = new Watchout(function() {}, function() {})
+        var watchout = new Watchout(function() {})
 
         assert.calledOnce(_cancelStub)
         assert.isFunction(watchout._deferredCancel)
@@ -73,11 +93,11 @@ buster.testCase('Watchout', {
         }), 100)
     },
 
-    'done() sets _stopped and executes _cancel() and _callback, where _callback is passed a success argument': function(){
+    'done() sets _stopped and executes _cancel() and _callback, where _callback is passed a success boolean': function(){
         var resetStub = this.stub(Watchout.prototype, 'reset')
         var _cancelStub = this.stub(Watchout.prototype, '_cancel')
         var spy = this.spy()
-        var watchout = new Watchout(function() {}, spy)
+        var watchout = new Watchout(spy)
 
         assert.isFalse(watchout._stopped)
         

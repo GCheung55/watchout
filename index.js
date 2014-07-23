@@ -9,6 +9,13 @@ var Watchout = prime({
     constructor: function(task, callback, time, context) {
         var scope = this
 
+        if (typeof callback == 'number' || callback == undefined) {
+            context = time
+            time = callback
+            callback = task
+            task = undefined
+        }
+
         scope._task = task
         scope._callback = callback
         scope._time = time
@@ -16,7 +23,7 @@ var Watchout = prime({
 
         scope.reset()
 
-        task(function() {
+        task && task(function() {
             scope.reset()
         }, function() {
             scope.done(true)
