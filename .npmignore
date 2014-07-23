@@ -1,0 +1,5 @@
+.gitignore
+.npmrc
+test/*
+coverage/*
+README.md
