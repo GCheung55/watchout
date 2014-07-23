@@ -1,8 +1,12 @@
 {
   "name": "watchout",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Javascript Watchdog Timer",
-  "keywords": ["prime", "watchdog", "timer"],
+  "keywords": [
+    "prime",
+    "watchdog",
+    "timer"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/.bin/buster-test --node"
