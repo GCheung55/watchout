@@ -83,7 +83,7 @@ var Watchout = prime({
 
             scope._cancel()
 
-            scope._callback.call(scope, !!success)
+            scope._callback(!!success)
         }
     },
 
