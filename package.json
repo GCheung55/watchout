@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/GCheung55/watchout",
   "dependencies": {
+    "mout": "^0.9.1",
     "prime": "^0.4.2"
   },
   "devDependencies": {

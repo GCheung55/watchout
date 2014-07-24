@@ -2,31 +2,38 @@
 
 var prime = require('prime')
 var defer = require('prime/defer')
+var partial = require('mout/function/partial')
+
+var checkArg = function(name, arg){
+    if (arg == undefined) {
+        throw new Error('Missing argument: ' + name)
+    }
+}
+
+var checkTime = partial(checkArg, 'time')
+var checkCallback = partial(checkArg, 'callback')
 
 var Watchout = prime({
     _stopped: false,
 
-    constructor: function(task, callback, time, context) {
+    constructor: function(time, callback, task) {
         var scope = this
 
-        if (typeof callback == 'number' || callback == undefined) {
-            context = time
-            time = callback
-            callback = task
-            task = undefined
-        }
-
-        scope._task = task
-        scope._callback = callback
+        checkTime(time)
+        checkCallback(callback)
+        
         scope._time = time
-        scope._context = context
+        scope._callback = callback
+        scope._task = task
 
-        scope.reset()
+        scope._setDefer()
 
         task && task(function() {
             scope.reset()
         }, function() {
-            scope.done(true)
+            scope.pass()
+        }, function() {
+            scope.cancel()
         })
     },
 
@@ -42,6 +49,14 @@ var Watchout = prime({
         delete scope._deferredCancel
     },
 
+    _setDefer: function() {
+        var scope = this
+
+        scope._deferredCancel = defer(function() {
+            scope.fail()
+        }, scope._time)
+    },
+
     /**
      * Reset the watchdog
      */
@@ -52,9 +67,7 @@ var Watchout = prime({
         if (!scope._stopped) {
             scope._cancel()
 
-            scope._deferredCancel = defer(function() {
-                scope.done(false)
-            }, time)
+            scope._setDefer()
         }
     },
 
@@ -70,8 +83,22 @@ var Watchout = prime({
 
             scope._cancel()
 
-            scope._callback.call(scope._context, !!success)
+            scope._callback.call(scope, !!success)
         }
+    },
+
+    /**
+     * Convenience method triggering done successfully
+     */
+    pass: function() {
+        this.done(true)
+    },
+
+    /**
+     * Convenience method triggering done unsuccessfully
+     */
+    fail: function() {
+        this.done(false)
     },
 
     /**
