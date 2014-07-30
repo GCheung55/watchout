@@ -80,11 +80,11 @@ buster.testCase('Watchout', {
             }
         },
 
-        'executes callback function with success boolean': function(done) {
-            new Watchout(1, function(success){
-                assert.isTrue(success)
-                new Watchout(1, function(success){
-                    assert.isFalse(success)
+        'executes callback function with haltedTimeout boolean': function(done) {
+            new Watchout(1, function(haltedTimeout){
+                assert.isTrue(haltedTimeout)
+                new Watchout(1, function(haltedTimeout){
+                    assert.isFalse(haltedTimeout)
                     done()
                 })
             }, function(r, d){
@@ -122,7 +122,7 @@ buster.testCase('Watchout', {
         assert.isFunction(watchout._deferredCancel)
     },
 
-    'done() sets _stopped and executes _cancel() and _callback, where _callback is passed a success boolean': function(){
+    'done() sets _stopped and executes _cancel() and _callback, where _callback is passed a haltedTimeout boolean': function(){
         var _setDeferStub = this.stub(Watchout.prototype, '_setDefer')
         var _cancelStub = this.stub(Watchout.prototype, '_cancel')
         var spy = this.spy()

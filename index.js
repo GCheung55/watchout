@@ -73,9 +73,9 @@ var Watchout = prime({
 
     /**
      * Complete by canceling the watchdog and calling callback
-     * @param  {Boolean}   success Determine whether the task was completed before the timeout
+     * @param  {Boolean}   haltedTimeout Determine whether the task was completed before the timeout
      */
-    done: function(success) {
+    done: function(haltedTimeout) {
         var scope = this
 
         if (!scope._stopped) {
@@ -83,7 +83,7 @@ var Watchout = prime({
 
             scope._cancel()
 
-            scope._callback(!!success)
+            scope._callback(!!haltedTimeout)
         }
     },
 
