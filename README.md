@@ -1,4 +1,4 @@
-watchout
+watchout [![Build Status](https://travis-ci.org/GCheung55/watchout.png?branch=master)](https://travis-ci.org/GCheung55/watchout)
 ========
 
 `watchout` is a JavaScript watchdog timer with a very simple API. 
