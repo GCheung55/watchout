@@ -16,6 +16,12 @@ var checkCallback = partial(checkArg, 'callback')
 var Watchout = prime({
     _stopped: false,
 
+    /**
+     * Constructor
+     * @param  {Number}   time                      Delay for deferred function
+     * @param  {Function} callback                  Deferred function
+     * @param  {Function} task(reset, done, cancel) Optional. Executed immediately after deferred is created.
+     */
     constructor: function(time, callback, task) {
         var scope = this
 
@@ -26,10 +32,10 @@ var Watchout = prime({
         scope._callback = callback
         scope._task = task
 
-        scope._setDefer()
+        scope._setDefer(time)
 
-        task && task(function() {
-            scope.reset()
+        task && task(function(time) {
+            scope.reset(time)
         }, function() {
             scope.pass()
         }, function() {
@@ -39,6 +45,7 @@ var Watchout = prime({
 
     /**
      * Cancel and cleanup deferred
+     * @private
      */
     _cancel: function() {
         var scope = this
@@ -49,25 +56,37 @@ var Watchout = prime({
         delete scope._deferredCancel
     },
 
-    _setDefer: function() {
+    /**
+     * Generate a deferred function
+     * @private
+     * @param {Number} time Delay for deferred function
+     */
+    _setDefer: function(time) {
         var scope = this
+
+        checkTime(time)
 
         scope._deferredCancel = defer(function() {
             scope.fail()
-        }, scope._time)
+        }, time)
     },
 
     /**
-     * Reset the watchdog
+     * Reset the watchdog. Cancels the previously set deferred function
+     * and sets a new one.
+     * @param  {Number} time Delay for the deferred
      */
-    reset: function() {
+    reset: function(time) {
         var scope = this
-        var time = scope._time
+
+        if (time === undefined) {
+            time = scope._time
+        }
 
         if (!scope._stopped) {
             scope._cancel()
 
-            scope._setDefer()
+            scope._setDefer(time)
         }
     },
 

@@ -35,16 +35,17 @@ buster.testCase('Watchout', {
 
         'executes task function with three arguments: reset, done, and cancel functions': {
 
-            'where reset function executes `reset()`': function() {
+            'where reset function executes `reset()`, with optional time argument': function() {
                 var resetStub = this.stub(Watchout.prototype, 'reset')
                 var doneStub = this.stub(Watchout.prototype, 'done')
                 var _setDeferStub = this.stub(Watchout.prototype, '_setDefer')
+                var time = 5
 
                 new Watchout(1, function() {}, function(reset) {
-                    reset()
+                    reset(time)
                 })
 
-                assert.calledOnce(resetStub)
+                assert.calledOnceWith(resetStub, time)
                 assert.calledOnce(_setDeferStub)
                 refute.called(doneStub)
             },
@@ -93,6 +94,23 @@ buster.testCase('Watchout', {
         }
     },
 
+    '_setDefer() throws if there is no time argument, otherwise sets _deferredCancel': function() {
+        var inst = new function(){}
+
+        inst._setDefer = Watchout.prototype._setDefer
+
+        assert.exception(function(){
+            inst._setDefer()
+        })
+
+        refute.exception(function(){
+            inst._setDefer(1)
+        })
+
+        assert.isFunction(inst._deferredCancel)
+        inst._deferredCancel()
+    },
+
     '_cancel() cleans up deferred': function() {
         this.stub(Watchout.prototype, '_setDefer')
         this.stub(Watchout.prototype, 'done')
@@ -111,15 +129,35 @@ buster.testCase('Watchout', {
         assert.calledOnce(spy)
     },
 
-    'reset() executes _cancel, and sets _deferredCancel': function(done) {
-        var _cancelStub = this.stub(Watchout.prototype, '_cancel')
+    'reset()': {
+        'executes _cancel, and sets _deferredCancel': function(done) {
+            var _cancelStub = this.stub(Watchout.prototype, '_cancel')
 
-        var watchout = new Watchout(1, done)
+            var watchout = new Watchout(1, done)
 
-        watchout.reset()
+            watchout.reset()
 
-        assert.calledOnce(_cancelStub)
-        assert.isFunction(watchout._deferredCancel)
+            assert.calledOnce(_cancelStub)
+            assert.isFunction(watchout._deferredCancel)
+        },
+
+        'optionally takes a timeout argument for defer, but does not replace _time': function() {
+            var _cancelStub = this.stub(Watchout.prototype, '_cancel')
+            var _setDeferStub = this.stub(Watchout.prototype, '_setDefer')
+            var watchout = new Watchout(1, function(){})
+            var expect = 5
+            
+            watchout.reset()
+
+            assert.calledWith(_setDeferStub, 1)
+
+            watchout.reset(expect)
+
+            assert.calledWith(_setDeferStub, 5)
+            assert.equals(watchout._time, 1)
+            
+            watchout.cancel()
+        }
     },
 
     'done() sets _stopped and executes _cancel() and _callback, where _callback is passed a haltedTimeout boolean': function(){
