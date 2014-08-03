@@ -43,7 +43,7 @@ watchdog.cancel()
 ### Reset
 A timer can be reset, or extended.
 
-```javacsript
+```javascript
 var watchout = require('watchout')
 
 var watchdog = new watchout(5000, function(haltedTimeout){
